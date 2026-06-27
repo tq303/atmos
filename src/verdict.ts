@@ -27,6 +27,13 @@ export function getPollenLevel(value: number): { label: string; color: AqiColor 
   return { label: 'Very High', color: 'red' };
 }
 
+export function getHumidityInfo(humidity: number): { label: string; color: AqiColor } {
+  if (humidity < 30) return { label: 'Low', color: 'yellow' };
+  if (humidity < 60) return { label: 'Moderate', color: 'green' };
+  if (humidity < 80) return { label: 'High', color: 'yellow' };
+  return { label: 'Very High', color: 'red' };
+}
+
 export function getUvInfo(uv: number): UvInfo {
   if (uv <= 2) return { label: 'Low', recommendation: 'no protection needed', color: 'green' };
   if (uv <= 5) return { label: 'Moderate', recommendation: 'wear SPF', color: 'yellow' };
