@@ -46,6 +46,7 @@ export function formatAnsi(location: string, data: AirQualityData): string {
   lines.push(`  ${ansi(location, "green", true)} — ${date}`);
   lines.push(SEP);
   lines.push(`  Temperature    ${col(`${data.temperature}°C`, COL, null, true)}  feels like ${data.feelsLike}°C`);
+  lines.push(`  Humidity       ${col(`${data.humidity}%`, COL, null, true)}`);
   lines.push(`  Air Quality    ${col(aqiInfo.label, COL, aqiInfo.color, true)}  (AQI ${data.aqi})`);
 
   if (data.dominantPollen) {
@@ -116,6 +117,7 @@ export function formatHtml(location: string, data: AirQualityData): string {
   <p class="sub">${escHtml(location)} — ${escHtml(date)}</p>
   <table>
     <tr><td>Temperature</td><td>${data.temperature}°C</td><td>feels like ${data.feelsLike}°C</td></tr>
+    <tr><td>Humidity</td><td>${data.humidity}%</td><td></td></tr>
     <tr><td>Air Quality</td><td style="color:${colorMap[aqiInfo.color]}">${escHtml(aqiInfo.label)}</td><td>AQI ${data.aqi}</td></tr>
     ${pollenRow}
     <tr><td>UV Index</td><td style="color:${colorMap[uvInfo.color]}">${data.uv}</td><td>${escHtml(uvInfo.recommendation)}</td></tr>

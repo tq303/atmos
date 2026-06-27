@@ -5,6 +5,7 @@ export interface AirQualityData {
   timezone: string;
   temperature: number;
   feelsLike: number;
+  humidity: number;
 }
 
 export async function fetchAirQuality(lat: number, lon: number): Promise<AirQualityData> {
@@ -21,7 +22,7 @@ export async function fetchAirQuality(lat: number, lon: number): Promise<AirQual
     fetch(
       `https://api.open-meteo.com/v1/forecast?${new URLSearchParams({
         ...base,
-        current: 'temperature_2m,apparent_temperature',
+        current: 'temperature_2m,apparent_temperature,relative_humidity_2m',
       })}`,
       { signal: AbortSignal.timeout(8000) },
     ),
@@ -51,5 +52,6 @@ export async function fetchAirQuality(lat: number, lon: number): Promise<AirQual
     timezone: (aq.timezone as string) ?? 'UTC',
     temperature: Math.round(w.temperature_2m),
     feelsLike: Math.round(w.apparent_temperature),
+    humidity: Math.round(w.relative_humidity_2m),
   };
 }
