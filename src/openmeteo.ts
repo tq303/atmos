@@ -2,6 +2,7 @@ export interface AirQualityData {
   aqi: number;
   uv: number;
   dominantPollen: { type: string; value: number } | null;
+  timezone: string;
 }
 
 export async function fetchAirQuality(lat: number, lon: number): Promise<AirQualityData> {
@@ -10,6 +11,7 @@ export async function fetchAirQuality(lat: number, lon: number): Promise<AirQual
     longitude: lon.toString(),
     current:
       'european_aqi,uv_index,grass_pollen,birch_pollen,alder_pollen,mugwort_pollen',
+    timezone: 'auto',
   });
 
   const res = await fetch(
@@ -19,8 +21,8 @@ export async function fetchAirQuality(lat: number, lon: number): Promise<AirQual
 
   if (!res.ok) throw new Error(`Open-Meteo responded ${res.status}`);
 
-  const data = (await res.json()) as Record<string, Record<string, number | null>>;
-  const c = data.current;
+  const data = (await res.json()) as Record<string, unknown>;
+  const c = data.current as Record<string, number | null>;
 
   const pollens: [string, number | null][] = [
     ['grass', c.grass_pollen ?? null],
@@ -36,5 +38,6 @@ export async function fetchAirQuality(lat: number, lon: number): Promise<AirQual
     aqi: (c.european_aqi as number) ?? 0,
     uv: (c.uv_index as number) ?? 0,
     dominantPollen: valid.length > 0 ? { type: valid[0][0], value: valid[0][1] } : null,
+    timezone: (data.timezone as string) ?? 'UTC',
   };
 }
