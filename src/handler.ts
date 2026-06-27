@@ -18,6 +18,7 @@ function isCurl(req: IncomingMessage): boolean {
 }
 
 export async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const start = Date.now();
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
   const raw = url.pathname.replace(/^\/+/, '').trim();
   const curl = isCurl(req);
@@ -25,6 +26,7 @@ export async function handle(req: IncomingMessage, res: ServerResponse): Promise
   const send = (body: string, html = false) => {
     res.setHeader('Content-Type', html ? 'text/html; charset=utf-8' : 'text/plain; charset=utf-8');
     res.end(body);
+    console.log(`${req.method} ${url.pathname} ${res.statusCode ?? 200} ${Date.now() - start}ms`);
   };
 
   try {
