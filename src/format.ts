@@ -21,8 +21,10 @@ function col(plain: string, width: number, color: AnsiColor | null, useAnsi: boo
   return ansi(plain, color, true) + pad;
 }
 
-function formatDate(d: Date): string {
-  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
+function formatDateTime(d: Date): string {
+  const date = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
+  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  return `${date}, ${time}`;
 }
 
 const SEP = '  ──────────────────────────────';
@@ -37,7 +39,7 @@ export function formatAnsi(location: string, data: AirQualityData): string {
     uv: data.uv,
   });
 
-  const date = formatDate(new Date());
+  const date = formatDateTime(new Date());
   const lines: string[] = [''];
 
   lines.push(`  ${ansi(location, 'green', true)} — ${date}`);
@@ -71,7 +73,7 @@ export function formatHtml(location: string, data: AirQualityData): string {
   });
 
   const colorMap: Record<AnsiColor, string> = { green: '#3fb950', yellow: '#d29922', red: '#f85149' };
-  const date = formatDate(new Date());
+  const date = formatDateTime(new Date());
 
   let pollenRow = '';
   if (data.dominantPollen) {
