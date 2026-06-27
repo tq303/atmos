@@ -23,7 +23,7 @@ function col(plain: string, width: number, color: AnsiColor | null, useAnsi: boo
 
 function formatDateTime(d: Date, timezone: string): string {
   const opts = { timeZone: timezone } as const;
-  const date = d.toLocaleDateString("en-GB", { ...opts, weekday: "long", day: "numeric", month: "short" });
+  const date = d.toLocaleDateString("en-GB", { ...opts, weekday: "long", day: "numeric", month: "long" });
   const time = d.toLocaleTimeString("en-GB", { ...opts, hour: "2-digit", minute: "2-digit" });
   return `${date}, ${time}`;
 }
