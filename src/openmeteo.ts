@@ -3,26 +3,36 @@ export interface AirQualityData {
   uv: number;
   dominantPollen: { type: string; value: number } | null;
   timezone: string;
+  temperature: number;
+  feelsLike: number;
 }
 
 export async function fetchAirQuality(lat: number, lon: number): Promise<AirQualityData> {
-  const params = new URLSearchParams({
-    latitude: lat.toString(),
-    longitude: lon.toString(),
-    current:
-      'european_aqi,uv_index,grass_pollen,birch_pollen,alder_pollen,mugwort_pollen',
-    timezone: 'auto',
-  });
+  const base = { latitude: lat.toString(), longitude: lon.toString(), timezone: 'auto' };
 
-  const res = await fetch(
-    `https://air-quality-api.open-meteo.com/v1/air-quality?${params}`,
-    { signal: AbortSignal.timeout(8000) },
-  );
+  const [aqRes, wxRes] = await Promise.all([
+    fetch(
+      `https://air-quality-api.open-meteo.com/v1/air-quality?${new URLSearchParams({
+        ...base,
+        current: 'european_aqi,uv_index,grass_pollen,birch_pollen,alder_pollen,mugwort_pollen',
+      })}`,
+      { signal: AbortSignal.timeout(8000) },
+    ),
+    fetch(
+      `https://api.open-meteo.com/v1/forecast?${new URLSearchParams({
+        ...base,
+        current: 'temperature_2m,apparent_temperature',
+      })}`,
+      { signal: AbortSignal.timeout(8000) },
+    ),
+  ]);
 
-  if (!res.ok) throw new Error(`Open-Meteo responded ${res.status}`);
+  if (!aqRes.ok) throw new Error(`Open-Meteo AQ responded ${aqRes.status}`);
+  if (!wxRes.ok) throw new Error(`Open-Meteo weather responded ${wxRes.status}`);
 
-  const data = (await res.json()) as Record<string, unknown>;
-  const c = data.current as Record<string, number | null>;
+  const [aq, wx] = (await Promise.all([aqRes.json(), wxRes.json()])) as Record<string, unknown>[];
+  const c = aq.current as Record<string, number | null>;
+  const w = wx.current as Record<string, number>;
 
   const pollens: [string, number | null][] = [
     ['grass', c.grass_pollen ?? null],
@@ -38,6 +48,8 @@ export async function fetchAirQuality(lat: number, lon: number): Promise<AirQual
     aqi: (c.european_aqi as number) ?? 0,
     uv: (c.uv_index as number) ?? 0,
     dominantPollen: valid.length > 0 ? { type: valid[0][0], value: valid[0][1] } : null,
-    timezone: (data.timezone as string) ?? 'UTC',
+    timezone: (aq.timezone as string) ?? 'UTC',
+    temperature: Math.round(w.temperature_2m),
+    feelsLike: Math.round(w.apparent_temperature),
   };
 }
