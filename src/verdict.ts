@@ -28,10 +28,10 @@ export function getPollenLevel(value: number): { label: string; color: AqiColor 
 }
 
 export function getHumidityInfo(humidity: number): { label: string; color: AqiColor } {
-  if (humidity < 30) return { label: 'Low', color: 'yellow' };
-  if (humidity < 60) return { label: 'Moderate', color: 'green' };
-  if (humidity < 80) return { label: 'High', color: 'yellow' };
-  return { label: 'Very High', color: 'red' };
+  if (humidity < 30) return { label: 'Dry', color: 'yellow' };
+  if (humidity < 60) return { label: 'Comfortable', color: 'green' };
+  if (humidity < 80) return { label: 'Humid', color: 'yellow' };
+  return { label: 'Very Humid', color: 'red' };
 }
 
 export function getUvInfo(uv: number): UvInfo {
