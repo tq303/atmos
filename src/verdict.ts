@@ -27,6 +27,15 @@ export function getPollenLevel(value: number): { label: string; color: AqiColor 
   return { label: 'Very High', color: 'red' };
 }
 
+export function getPrecipitationInfo(mm: number, probability: number): { label: string; color: AqiColor } {
+  if (mm === 0 && probability < 20) return { label: 'None', color: 'green' };
+  if (mm === 0 && probability < 60) return { label: 'Possible', color: 'yellow' };
+  if (mm === 0) return { label: 'Likely', color: 'yellow' };
+  if (mm < 2.5) return { label: 'Light', color: 'yellow' };
+  if (mm < 7.5) return { label: 'Moderate', color: 'red' };
+  return { label: 'Heavy', color: 'red' };
+}
+
 export function getHumidityInfo(humidity: number): { label: string; color: AqiColor } {
   if (humidity < 30) return { label: 'Dry', color: 'yellow' };
   if (humidity < 60) return { label: 'Comfortable', color: 'green' };

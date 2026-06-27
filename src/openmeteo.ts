@@ -6,6 +6,8 @@ export interface AirQualityData {
   temperature: number;
   feelsLike: number;
   humidity: number;
+  precipitation: number;
+  precipitationProbability: number;
 }
 
 export async function fetchAirQuality(lat: number, lon: number): Promise<AirQualityData> {
@@ -22,7 +24,7 @@ export async function fetchAirQuality(lat: number, lon: number): Promise<AirQual
     fetch(
       `https://api.open-meteo.com/v1/forecast?${new URLSearchParams({
         ...base,
-        current: 'temperature_2m,apparent_temperature,relative_humidity_2m',
+        current: 'temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,precipitation_probability',
       })}`,
       { signal: AbortSignal.timeout(8000) },
     ),
@@ -53,5 +55,7 @@ export async function fetchAirQuality(lat: number, lon: number): Promise<AirQual
     temperature: Math.round(w.temperature_2m),
     feelsLike: Math.round(w.apparent_temperature),
     humidity: Math.round(w.relative_humidity_2m),
+    precipitation: w.precipitation ?? 0,
+    precipitationProbability: Math.round(w.precipitation_probability ?? 0),
   };
 }
