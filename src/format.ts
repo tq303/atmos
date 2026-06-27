@@ -23,7 +23,12 @@ function col(plain: string, width: number, color: AnsiColor | null, useAnsi: boo
 
 function formatDateTime(d: Date, timezone: string): string {
   const opts = { timeZone: timezone } as const;
-  const date = d.toLocaleDateString("en-GB", { ...opts, weekday: "long", day: "numeric", month: "long" });
+  const date = d.toLocaleDateString("en-GB", {
+    ...opts,
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
   const time = d.toLocaleTimeString("en-GB", { ...opts, hour: "2-digit", minute: "2-digit" });
   return `${date}, ${time}`;
 }
@@ -45,9 +50,13 @@ export function formatAnsi(location: string, data: AirQualityData): string {
 
   lines.push(`  ${ansi(location, "green", true)} — ${date}`);
   lines.push(SEP);
-  lines.push(`  Temperature    ${col(`${data.temperature}°C`, COL, null, true)}  feels like ${data.feelsLike}°C`);
+  lines.push(
+    `  Temperature    ${col(`${data.temperature}°C`, COL, null, true)}  feels like ${data.feelsLike}°C`,
+  );
   const humidityInfo = getHumidityInfo(data.humidity);
-  lines.push(`  Humidity       ${col(humidityInfo.label, COL, humidityInfo.color, true)}  (${data.humidity}%)`);
+  lines.push(
+    `  Humidity       ${col(humidityInfo.label, COL, humidityInfo.color, true)}  (${data.humidity}%)`,
+  );
   lines.push(`  Air Quality    ${col(aqiInfo.label, COL, aqiInfo.color, true)}  (AQI ${data.aqi})`);
 
   if (data.dominantPollen) {
@@ -98,7 +107,7 @@ export function formatHtml(location: string, data: AirQualityData): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>atmos.sh — ${escHtml(location)}</title>
+  <title>atmos — ${escHtml(location)}</title>
   <style>
     *{box-sizing:border-box}
     body{font-family:monospace;background:#0d1117;color:#c9d1d9;max-width:640px;margin:2rem auto;padding:1rem}
@@ -114,7 +123,6 @@ export function formatHtml(location: string, data: AirQualityData): string {
   </style>
 </head>
 <body>
-  <h1>atmos</h1>
   <p class="sub">${escHtml(location)} — ${escHtml(date)}</p>
   <table>
     <tr><td>Temperature</td><td>${data.temperature}°C</td><td>feels like ${data.feelsLike}°C</td></tr>
@@ -124,11 +132,6 @@ export function formatHtml(location: string, data: AirQualityData): string {
     <tr><td>UV Index</td><td style="color:${colorMap[uvInfo.color]}">${data.uv}</td><td>${escHtml(uvInfo.recommendation)}</td></tr>
     <tr class="sep"><td colspan="3" class="verdict" style="color:${colorMap[verdict.color]}">${escHtml(verdict.symbol)} ${escHtml(verdict.text)}</td></tr>
   </table>
-  <p style="color:#8b949e">Use from your terminal:</p>
-  <pre>curl atmos.sh              # auto-detect from IP
-curl atmos.sh/${escHtml(encodeURIComponent(location))}
-curl atmos.sh/London
-curl atmos.sh/51.45,-2.58  # lat,lon</pre>
 </body>
 </html>`;
 }
