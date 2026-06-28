@@ -27,6 +27,17 @@ export function getPollenLevel(value: number): { label: string; color: AqiColor 
   return { label: 'Very High', color: 'red' };
 }
 
+export function getWindInfo(speed: number, degrees: number): { label: string; color: AqiColor; direction: string } {
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  const direction = directions[Math.round(degrees / 45) % 8];
+
+  if (speed < 6) return { label: 'Calm', color: 'green', direction };
+  if (speed < 20) return { label: 'Light', color: 'green', direction };
+  if (speed < 40) return { label: 'Moderate', color: 'yellow', direction };
+  if (speed < 60) return { label: 'Strong', color: 'red', direction };
+  return { label: 'Storm', color: 'red', direction };
+}
+
 export function getPrecipitationInfo(mm: number, probability: number): { label: string; color: AqiColor } {
   if (mm === 0 && probability < 20) return { label: 'None', color: 'green' };
   if (mm === 0 && probability < 60) return { label: 'Possible', color: 'yellow' };

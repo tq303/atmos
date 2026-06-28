@@ -1,4 +1,4 @@
-import { getAqiInfo, getHumidityInfo, getPrecipitationInfo, getPollenLevel, getUvInfo, getVerdict } from "./verdict.ts";
+import { getAqiInfo, getHumidityInfo, getPrecipitationInfo, getPollenLevel, getUvInfo, getVerdict, getWindInfo } from "./verdict.ts";
 import type { AirQualityData } from "./openmeteo.ts";
 
 const C = {
@@ -57,6 +57,8 @@ export function formatAnsi(location: string, data: AirQualityData): string {
   lines.push(
     `  Humidity       ${col(humidityInfo.label, COL, humidityInfo.color, true)}  (${data.humidity}%)`,
   );
+  const windInfo = getWindInfo(data.windSpeed, data.windDirection);
+  lines.push(`  Wind           ${col(windInfo.label, COL, windInfo.color, true)}  (${data.windSpeed} km/h ${windInfo.direction})`);
   const precipInfo = getPrecipitationInfo(data.precipitation, data.precipitationProbability);
   const precipDetail = data.precipitation > 0 ? `${data.precipitation}mm` : `${data.precipitationProbability}% chance`;
   lines.push(`  Precipitation  ${col(precipInfo.label, COL, precipInfo.color, true)}  (${precipDetail})`);
@@ -130,6 +132,7 @@ export function formatHtml(location: string, data: AirQualityData): string {
   <table>
     <tr><td>Temperature</td><td>${data.temperature}°C</td><td>feels like ${data.feelsLike}°C</td></tr>
     <tr><td>Humidity</td><td style="color:${colorMap[getHumidityInfo(data.humidity).color]}">${getHumidityInfo(data.humidity).label}</td><td>${data.humidity}%</td></tr>
+    <tr><td>Wind</td><td style="color:${colorMap[getWindInfo(data.windSpeed, data.windDirection).color]}">${getWindInfo(data.windSpeed, data.windDirection).label}</td><td>${data.windSpeed} km/h ${getWindInfo(data.windSpeed, data.windDirection).direction}</td></tr>
     <tr><td>Precipitation</td><td style="color:${colorMap[getPrecipitationInfo(data.precipitation, data.precipitationProbability).color]}">${getPrecipitationInfo(data.precipitation, data.precipitationProbability).label}</td><td>${data.precipitation > 0 ? `${data.precipitation}mm` : `${data.precipitationProbability}% chance`}</td></tr>
     <tr><td>Air Quality</td><td style="color:${colorMap[aqiInfo.color]}">${escHtml(aqiInfo.label)}</td><td>AQI ${data.aqi}</td></tr>
     ${pollenRow}
